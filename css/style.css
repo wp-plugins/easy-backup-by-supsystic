@@ -1,0 +1,164 @@
+/*
+Theme Name: Standard
+Theme URI: https://supsystic.com/
+Author: Ecommerce plugin Creators
+Author URI: https://supsystic.com/
+Description: This is a default theme to our plugin
+Version: 1.0
+*/
+
+.bupErrorMsg {
+    color: red;
+    font-weight: bold;
+}
+.bupSuccessMsg {
+    color: green;
+    font-weight: bold;
+}
+.bupInputError {
+    border: 2px red solid !important;
+}
+.toeUpdateQtyButtonsWrapper {float:left; margin:4px 0 0 -22px;}
+    
+.toeIncDecButton {
+    width: 8px;
+    height: 7px;
+    background: url("../img/toeIncDec.png") top right no-repeat;
+    /*overflow: hidden;*/
+    /*display:block;*/
+    text-decoration:none;
+    cursor: pointer;
+    /*margin: 0 0 0 5px;*/
+    /*text-align: center;*/
+    text-indent: -9999px;
+}
+.toeIncButton {
+    margin-bottom:5px;
+    background-position: top left;
+}.bupShowLogDlg{
+	 cursor: pointer;
+	 font-size: 13px;
+ }
+
+#wp-admin-bar-comingsoon a {
+    background-color: #FF4444;
+    color: #FFFFFF;
+}
+#wp-admin-bar-comingsoon a:hover {
+	background-color: #FF3333 !important;
+	background-image: none !important;
+}
+.toePagingElement {
+    padding: 10px;
+}
+.bupStatusIndicator {
+    width: 32px;
+    height: 32px;
+}
+.bupStatusIndicator.active {
+    background: url("../img/active.png") center center no-repeat !important;
+}
+.bupStatusIndicator.disabled {
+    background: url("../img/disabled.png") center center no-repeat !important;
+}
+.bupTblRow:hover {
+    /*background-color: yellowgreen;*/
+	background-color:#F3F3F3;
+}
+.bupTblHeader {
+    font-weight: bold;
+}
+.bupTblHeader td {
+    border-bottom: 1px solid black;
+}
+/*****/
+.bupOptTip {
+    float: right;
+    margin-top:5px;
+    margin-right: 3px;
+    width: 16px;
+    height: 16px;
+    background: url("../img/tip.png") no-repeat !important;
+}
+#bupOptDescription {
+    position: fixed;
+    z-index: 10010;
+    display: none;
+    padding:8px;
+    border:3px solid #b9e3f0;
+    -webkit-border-radius:8px;
+    -moz-border-radius:8px;
+    -o-border-radius:8px;
+    -khtml-border-radius:8px;
+    border-radius:8px;
+    background:#E3F4F9;
+    font-size:12px;
+}
+.bupHidden {
+    display: none;
+}
+
+.bupSchedulesTable {
+	padding: 20px;
+	border-collapse: separate;
+	border-spacing: 0;
+	border-width: 1px 0 0 1px;
+	margin-bottom: 24px;
+	width: 90%;
+	max-width: 1000px;
+}
+.bupSchedulesTable th{
+	font-size: large;
+	padding: 0 10px;
+}
+
+.bupSchedulesTable tr{
+	height: 40px;
+}
+
+.bupSchedulesTable th, table.bupSchedulesTable td{
+	text-align: center;
+}
+
+.bupSchedulesTable th:first-child, .bupSchedulesTable td:first-child{
+	text-align: left;
+	padding-left: 0;
+}
+
+table.bup-form-table-restore-presets th, table.bup-form-table-restore-presets td{
+	padding: 8px 0;
+	margin: 0;
+}
+
+div.bupPluginReviewBlock{
+	float: right;
+	margin-right: 30%;
+	background-color: #77EEA6;
+	padding: 10px;
+	border: 1px solid #000000;
+	border-radius: 10px;
+	-webkit-border-radius: 10px;
+}
+div.bupPluginReviewBlock p{
+	line-height: 1.3;
+	font-weight: 600;
+	font-size: 16px !important;
+}
+div.bupPluginReviewBlock a.bupDoNotShowReviewBlock{
+	color: #0D17DE;
+}
+
+/*Remote server backup auth table*/
+table.bupRemoteServerBackup td {
+	padding: 0 0 5px 0 !important;
+}
+
+.bupTable100per {
+	width: 100% !important;
+	max-width: 400px;
+}
+
+.inputField100per {
+	width: 100% !important;
+	max-width: 250px;
+}

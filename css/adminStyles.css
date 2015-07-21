@@ -1,0 +1,232 @@
+.cspAdminTemplateImgPrev {
+    max-width: 216px;
+}
+.cspAdminTemplateShell {
+    float: left;
+    padding: 19px;
+}
+#cspAdminTemplatesSelection {
+    display: none;
+}
+
+/* Tabs style */
+
+    .bupMainOptions a {background:url(img/main-icon.png) 12px 9px no-repeat; font-size:16px !important; }
+    .cspPresetTemplates a {background:url(img/template-icon.png) 12px 9px no-repeat;}    
+    .bupTemplateOptions a {background:url(img/design-icon.png) 12px 9px no-repeat;}    
+    .cspSubscribeOptions a {background:url(img/mail-icon.png) 12px 9px no-repeat;}
+    .cspSocIcons a {background:url(img/social-icon.png) 12px 9px no-repeat;}
+    .cspMetaIcons a {background:url(img/meta-icon.png) 12px 9px no-repeat;}
+	.bupScheduleOptions a {background:url(img/schedule-icon.png) 12px 9px no-repeat;}
+	.bupStorageOptions a {background:url(img/storage-icon.png) 12px 9px no-repeat;}
+	.bupLogOptions a {background:url(img/log-icon.png) 12px 9px no-repeat;}
+	.bupDropboxOptions a {background:url(img/dropbox-icon.png) 12px 9px no-repeat;}
+	.bupGdriveOptions a {background:url(img/gdrive-icon.png) 12px 9px no-repeat;}
+	.bupAmazonS3Options a {background:url(img/amazon-icon.png) 12px 9px no-repeat;}
+	.bupEmailOptions a {background:url(img/mail-icon.png) 12px 9px no-repeat;}
+	.bupOneDriveOptions a {background:url(img/onedrive-icon.png) 12px 9px no-repeat;}
+	
+	span.bupAIP, p.bupAIP {
+		margin: 0;
+		font-size: xx-small;
+	}
+/* Tabs content style */
+.cspNiceStyle { }
+
+    .cspNiceStyle table tr:hover {background:none;}
+    .cspNiceStyle table tr td {padding:5px;}
+    
+    .cspHeadCells { }
+        .cspHeadCells td { }
+            .cspHeadCells td .ui-button-text-only {width:100%;}
+            .cspBodyCells td { padding:10px; border:1px solid #e7e7e7; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px;background:#fff !important;}
+            
+    .cspLeftCol { float:left;width:50%;}        
+    .cspRightCol { float:right;width:50%;}   
+    
+    .cspBgImgShowTypeWrapper label span {padding:5px !important;}
+    
+    #cspOptBgImgPrev {padding:3px; -moz-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5); -webkit-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5); box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);}
+    
+    .cspTip {position:relative; margin:15px 0; padding:5px; -webkit-border-radius: 5px; border-radius: 5px; background:#dedede;}
+        .cspTipCorner { position:absolute;display:block; width:14px; height:14px; background:url(img/tip-corner.png) no-repeat;}
+        .cspTipArrowUp .cspTipCorner {top:-7px; left:50%; margin-left:-7px;}
+        .cspTipArrowDown .cspTipCorner {bottom:-7px; left:50%; margin-left:-7px;}
+        .cspTipArrowLeft .cspTipCorner {top:50%; left:-7px; margin-top:-7px;}
+        .cspTipArrowRight .cspTipCorner {top:50%; right:-7px; margin-top:-7px;}
+        
+
+    #cspAdminSocOptionsForm h4.cspTitle {margin:0 0 10px 0;}
+    .withCspOptTip input, .withCspOptTip select { float:left;width:90% !important;}
+    
+    .toplevel_page_coming_soon-modules-adminmenu-views-adminmenu .ui-dialog-titlebar { border:1px solid #1878ee;background:#0185cc url(img/button-bg.png) repeat-x !important; color:#fff; text-shadow:0 1px 0 #5e5cab;}
+        .cspAdminTemplateShell img {padding:3px; -moz-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5); -webkit-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5); box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);}
+        .cspAdminTemplateShellSelected img { background:#009900;}
+        
+label, span, input, button {
+    -webkit-transition: background 400ms ease;
+    -moz-transition: background 400ms ease;
+    -ms-transition: background 400ms ease;
+    -o-transition: background 400ms ease;
+    transition: background 400ms ease;
+}
+label, span, input, button {
+    -webkit-transition: border-color 200ms ease;
+    -moz-transition: border-color 200ms ease;
+    -ms-transition: border-color 200ms ease;
+    -o-transition: border-color 200ms ease;
+    transition: border-color 200ms ease;
+}
+.clearfix { float:none;clear:both;}
+.nomargin {margin:0 !important;}
+.cspOptTip, .cspOptTip span {border:none !important;}
+
+.cspAdminTemplateSelectedName {float:right; line-height:24px;}
+.cspSetTemplateOptionButton { width:100%;font-weight:bold;}
+.bupWrap, #dashboard-widgets .meta-box-sortables, .ui-buttonset {margin:0 !important;}
+.rightText {text-align:right;}
+.cspLeftCol input[type="checkbox"] { margin-top:11px !important;width:25px !important;}
+.inside input[type="checkbox"] {margin:5px 5px 0 0;}
+.accessDelElement { margin:0px 0px 5px 5px; }
+.accessDelElement a{ text-decoration: none; border-bottom: 1px dashed #000080;  }
+.backupBlock { margin-bottom: 25px; }
+.bupCheckbox { margin:0px 0px 0px 0px !important; display:block; position:relative;}
+
+#bupSystemInfo{ display:none; width:150px; text-align:left; border:1px dashed #00F; padding: 8px 15px;}
+
+#bup_a_maininfo{ margin:0px 0px 0px 5px; }
+#bupInfoBlock{ display:none; background:#F3F3F3; border:1px dashed #000; margin:10px 0px 0px 0px; padding:8px 4px; }
+#iBackupBlock{ margin:0px 0px 0px 10px;}
+#bupInfo, #bupInfo p { display: inline-block; }
+
+#bup_a_loginfo{ margin:0px 0px 0px 5px; }
+#bupLogBlock{ display:block; background:#F3F3F3; border:1px dashed #000; margin:10px 0px 0px 0px; padding:8px 4px; }
+#lBackupBlock{ margin:0px 0px 0px 10px;}
+
+.excludeOpt{ margin:0px 0px 0px 4px; }
+.excludeInput, .input-regular { width:250px !important; display:inline !important; }
+
+.bupSecretKeyForCryptDB {width: 100%}
+
+.log_scroll{ width:500px; padding:5px 3px; }
+.logBlock{ text-align:left; width:900px; }
+
+.bup_a_Send_to{ padding:0px 20px 0px 0px; }
+.bup_a_Send_to a{ text-decoration:none; }
+.bup_Send_to{ padding:0px 20px 0px 0px; display:none; }
+
+
+.delBackupDrBx{ background:url(img/delbup.png) no-repeat; width:16px; height:16px; display:block; float:right; margin:2px 3px 0px 0px; }
+
+.delBackup{ background:url(img/delbup.png) no-repeat; width:16px; height:16px; display:block; float:right; margin:2px 0px 0px 5px; }
+
+.DpDx_Main_Auth input{ width:200px !important; }
+.resetDrBx{ margin:0px 0px 0px 4px;}
+.resetDrBx a{ color:#00F !important; }
+.bupScheluleFieldset{ margin:10px 0px 0px 0px; padding:0px 0px 7px 10px; border:1px solid #000; }
+.paddingSchedule{ margin:0px 0px 0px 10px;}
+#bupScheduleTime{ width:30px !important; margin:1px 0px 0px 0px !important; }
+.bupScheduleCheckbox{ margin:3px 0px 0px 0px !important; }
+.disableScheduleFieldset{ border:1px solid #CCC !important; color:#CCC; }
+/*.disableScheduleFieldset legend{ color:#CCC; }*/
+.disableScheduleCheckbox{ }
+.disableScheduleText{}
+.bupScheduleEnableCheckbox{ margin-bottom: 3px !important; }
+
+.bupWarningRed{ color:#C00; }
+.bupBlueLink{ color:#0000FF !important; }
+.bupAdminFooterShell{ color: #777777; font-size: 12px; margin: 0 20px 0 165px; padding-bottom: 45px; border-top: 1px solid #DFDFDF; color: #777777; font-size: 12px; height: 65px;}
+.bupAdminFooterCell{ float: left; margin-right: 5px; padding-top: 8px; }
+.bupOptDest{ font-style:italic; text-decoration:none; }
+.bupApplyNow{ color:#09F !important; }
+
+
+
+/*Main page blocks styles*/
+.bupStartBackupAndLog, .bupBackupSettingsBlock {
+	display: inline-block;
+	vertical-align: top !important;
+}
+
+.bupStartBackupAndLog {
+	width: 60%;
+}
+
+.bupBackupSettingsBlock {
+	width: 39%;
+}
+
+.bupBackupAdvancedSettings {
+	display: none;
+	padding: 5px;
+	margin-top: 30px;
+}
+
+.bupBackupAdvancedSettings table td {
+	padding-top: 0 !important;
+}
+
+.bupBackupLog, .bupBackupAdvancedSettings {
+	border: 1px solid #CCC;
+}
+
+.bupBackupLog {
+	display: none;
+	overflow: auto;
+	max-height: 300px;
+	padding: 8px;
+}
+
+.bupStartLocalBackup, .bupStartDropBoxBackup {
+	display: inline-block;
+	min-width: 250px;
+	text-align: center;
+	margin-bottom: 3em !important;
+}
+
+.bupBackupButtonAnnotate{
+	position: relative;
+	top: 50px;
+	left: -253px;
+	display: inline-block;
+	width: 250px;
+	font-size: 0.85em;
+	font-weight: bolder;
+}
+
+table.bupBackupsList {
+	margin-top: 30px;
+}
+
+table.bupBackupsList th, table.bupBackupsList {
+	text-align: center;
+}
+
+table.bupBackupsList button {
+	margin-right: 20px !important;
+}
+
+table.bupBackupsList td:first-child{
+	text-align: left;
+}
+
+/*Main page blocks styles end*/
+
+/* =Media Queries
+-------------------------------------------------------------- */
+
+@media screen and (min-width:100px) and (max-width:1279px) {
+	.bupStartBackupAndLog, .bupBackupSettingsBlock {
+		display: block !important;
+		width: 80%;
+	}
+}
+
+@media screen and (max-width: 782px) {
+	.bupStartBackupAndLog, .bupBackupSettingsBlock {
+		display: block !important;
+		width: 80%;
+	}
+}
+/* =Media Queries end
+-------------------------------------------------------------- */
