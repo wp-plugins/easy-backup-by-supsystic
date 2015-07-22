@@ -2,7 +2,7 @@
 /**
  * Plugin Name: DropBox Backup by Supsystic
  * Description:  Backup to the DropBox and FTP with one click. DropBox backup restoration. Different backup types.
- * Version: 1.1
+ * Version: 1.1.3
  * Author: Supsystic
  * Author URI: http://supsystic.com/
  **/

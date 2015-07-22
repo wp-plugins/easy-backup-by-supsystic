@@ -1,3 +1,8 @@
+<style>
+    #bupMainOption div.error{
+        display: none;
+    }
+</style>
 <section xmlns="http://www.w3.org/1999/html">
     <div class="supsystic-item supsystic-panel">
         <?php
@@ -96,7 +101,7 @@
         </div>
 
         <div class="bupBackupSettingsBlock">
-            <button class="button button-primary button-large bupShowBackupAdvancedOptions" style="float: right;">Show Advanced Options</button>
+            <button class="button button-primary button-large bupShowBackupAdvancedOptions" style="float: right; min-width: 188px;">Show Advanced Options</button>
             <h3 style="margin-bottom: 0.5em">
                 <?php _e('Backup Type:', EBBS_LANG_CODE)?> <span style="font-weight: normal" id="bupBackupType"><?php _e('Full Backup', EBBS_LANG_CODE);?></span>
             </h3>

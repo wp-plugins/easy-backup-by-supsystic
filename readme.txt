@@ -2,7 +2,7 @@
 Contributors: supsystic.com
 Tags: dropbox backup, dropbox backup restoration, backup, back up, restoration, dropbox, FTP, mysql backup, database backup, db backup, full backup, restore, transfer, website backup, wordpress backup, backup plugins, backup posts, backup pages 
 Tested up to: 4.2.2
-Stable tag: 1.1
+Stable tag: 1.1.3
 
 Backup to the Dropbox and FTP with one click. DropBox backup restoration. Different types of backup.
 
@@ -36,6 +36,11 @@ Create Dropbox backup in one click. Easy-to-use functionality - now you don't ha
 6. Go to admin panel => open item "Plugins" => activate the plugin 
 
 == Changelog ==
+
+= 1.1.3 / 22.07.2015 =
+ * Minor interface change
+ * Added more local backup option
+ * Fixed minor backup to dropbox issue
 
 = 1.1. / 21.07.2015 =
  * Submit on WordPress.org

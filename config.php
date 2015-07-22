@@ -59,7 +59,7 @@
 
 
     define('EBBS_PLUGIN_INSTALLED', true);
-    define('EBBS_VERSION', '1.1');
+    define('EBBS_VERSION', '1.1.3');
 	define('EBBS_S_VERSION', EBBS_VERSION);
     define('EBBS_USER', 'user');
 

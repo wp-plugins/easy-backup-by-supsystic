@@ -43,6 +43,15 @@ jQuery(document).ready(function($) {
 		j('.bupSelectedOptionsWrapper').toggle(500);
 	});
 
+	j('.bupShowBackupAdvancedOptions').toggle(
+		function(){
+			j(this).html('Hide Advanced Options');
+		},
+		function(){
+			j(this).html('Show Advanced Options');
+		}
+	);
+
 	j('.bupBackupAdvancedSettings .bupCheckbox').on('click', function () {
 		checkBackupType(j);
 	});
