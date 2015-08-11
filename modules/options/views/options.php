@@ -60,24 +60,15 @@ class optionsViewEbbs extends viewEbbs {
             $dropBoxAuthButton = $dropBoxModule->getController()->authenticateAction();
         }
 
-        $model   = frameEbbs::_()->getModule('backup')->getController()->getModel();
-        $backups = dispatcherEbbs::applyFilters('adminGetUploadedFiles', array());
-        if(!empty($backups))
-            krsort($backups);
-
-        $logs = frameEbbs::_()->getModule('log')->getModel()->getFilesList();
-
 //        $lastBackupId = !empty($req['last_backup_id']) ? $req['last_backup_id'] : '0';
 //        frameEbbs::_()->addJSVar('adminOptionsEbbs', 'lastBackupId', $lastBackupId);
 
         $this->assign('zipExtExist', $zipExtExist);
         $this->assign('zipNotExtMsg', $zipNotExtMsg);
         $this->assign('backupOptions', parent::getContent('backupOptions'));
+        $this->assign('backupsList', frameEbbs::_()->getModule('backup')->getController()->getView()->getBackupsListContent());
 
         return parent::getContent('mainOptionsTab', array(
-            'backups'  => $backups,
-            'logs'     => $logs,
-            'model'    => $model,
             'isUserAuthenticatedInDropBox' => $isUserAuthenticatedInDropBox,
             'dropBoxAuthButton' => $dropBoxAuthButton,
         ));

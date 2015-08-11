@@ -22,6 +22,13 @@ class backupControllerEbbs extends controllerEbbs {
 		));
 	}
 
+    public function createBackupAction(){
+        $request = reqEbbs::get('post');
+
+        if(!empty($request['auth']) && $request['auth'] === AUTH_KEY)
+            $this->getModel('backup')->createBackup($request);
+    }
+
 	/**
 	 * Create Action
 	 * Create new backup
@@ -29,15 +36,17 @@ class backupControllerEbbs extends controllerEbbs {
 	public function createAction() {
         $request = reqEbbs::get('post');
         $response = new responseEbbs();
-
-        /** @var backupLogModelEbbs $log */
-        $log = $this->getModel('backupLog');
+        /** @var backupLogTxtModelEbbs $logTxt */
+        $logTxt = $this->getModel('backupLogTxt');
+        /** @var backupTechLogModelEbbs $techLog */
+        $techLog = $this->getModel('backupTechLog');
+        /** @var warehouseEbbs $bupFolder */
+        $bupFolder = frameEbbs::_()->getModule('warehouse');
+        $uploadingList = array();
+        $backupComplete = false;
 
         if(!empty($request['opt_values'])){
-            // clear previous log data
-            $log->clear();
             do_action('bupBeforeSaveBackupSettings', $request['opt_values']);
-            $log->writeBackupSettings($request['opt_values']);
             /* @var $optionsModel optionsModelEbbs*/
             $optionsModel = frameEbbs::_()->getModule('options')->getModel();
             $optionsModel->saveMainFromDestGroup($request);
@@ -45,7 +54,6 @@ class backupControllerEbbs extends controllerEbbs {
             $optionsModel->refreshOptions();
 
             // if warehouse changed - create necessary dir
-            $bupFolder = frameEbbs::_()->getModule('warehouse');
             if (!$bupFolder->getFolder()->exists())
                 $bupFolder->getFolder()->create();
         }
@@ -62,7 +70,6 @@ class backupControllerEbbs extends controllerEbbs {
         // We are need to check "warehouse" directory (usually: wp-content/upsupsystic)
         if (!$this->getModel()->checkWarehouse()) {
             $response->addError($this->getModel()->getWarehouseError());
-
             return $response->ajaxExec();
         }
 
@@ -70,98 +77,85 @@ class backupControllerEbbs extends controllerEbbs {
             return $response->ajaxExec();
         }
 
-        $filename = $this->getModel()->generateFilename(array('zip', 'sql', 'txt'));
+        $currentBackupPath = $this->getModel()->generateFilename(array('zip', 'sql', 'txt'));
+        $logTxt->setLogName(basename($currentBackupPath['folder']));
+        $logTxt->writeBackupSettings($request['opt_values']);
+        $logTxt->add(__('Clear temporary directory', EBBS_LANG_CODE));
+        $techLog->deleteOldLogs();
+        $techLog->setLogName(basename($currentBackupPath['folder']));
 
-        if ($this->getModel()->isFilesystemRequired() && empty($request['filesBackupComplete'])) {
-            if(!empty($request['opt_values']))
-                $log->saveBackupDirSetting($request['opt_values']);
-            if (!isset($request['complete'])) {
-                // Disallow to do backups while backup already in proccess.
-                $this->lock();
+        if ($this->getModel()->isDatabaseRequired()) {
+            $logTxt->add(__(sprintf('Start database backup: %s', $currentBackupPath['sql']), EBBS_LANG_CODE));
+            $this->getModel()->getDatabase()->create($currentBackupPath['sql']);
+            $dbErrors = $this->getModel()->getDatabase()->getErrors();
 
-                $files = $this->getModel()->getFilesList();
-                // $files = array_map('realpath', $files);
-
-                $log->string(sprintf('%s files scanned.', count($files)));
-
-                $warehouse = frameEbbs::_()->getModule('warehouse')->getPath();
-                $dir = frameEbbs::_()->getModule('warehouse')->getTemporaryPath();
-
-                $log->string(__('Clear out old temporary files', EBBS_LANG_CODE));
-                if (file_exists($file = $dir . '/stacks.dat')) {
-                    if (@unlink($file)) {
-                        $log->string(__(sprintf('%s successfully deleted', basename($file)), EBBS_LANG_CODE));
-                    } else {
-                        $log->string(__(sprintf('Cannot delete file %s. If you notice a problem with archives - delete the file manually', $file), EBBS_LANG_CODE));
-                    }
-                }
-                $tmpDirFiles = glob($dir . '/*');
-                if(!empty($tmpDirFiles) && is_array($tmpDirFiles)) {
-                    foreach ($tmpDirFiles as $tmp) {
-                        if (substr(basename($tmp), 0, 3) === 'BUP') {
-                            if (@unlink($tmp)) {
-                                $log->string(__(sprintf('%s successfully deleted', $tmp), EBBS_LANG_CODE));
-                            } else {
-                                $log->string(__(sprintf('Cannot delete file %s', $tmp), EBBS_LANG_CODE));
-                            }
-                        }
-                    }
-                }
-
-                $response->addData(array(
-                    'files'     => $files,
-                    'per_stack' => EBBS_FILES_PER_STACK,
-                ));
-
-                $log->string(__('Send request to generate temporary file stacks', EBBS_LANG_CODE));
-
+            if (!empty($dbErrors)) {
+                $logTxt->add(__(sprintf('Errors during creation of database backup, errors count %d', count($dbErrors)), EBBS_LANG_CODE));
+                $response->addError($dbErrors);
                 return $response->ajaxExec();
             }
 
-            $log->string(__(sprintf('Create a backup of the file system: %s', $filename['zip']), EBBS_LANG_CODE));
-            $this->getModel()->getFilesystem()->create($filename['zip']);
-
-            $log->setCurrentBackupFilesName($filename['zip']);
+            $logTxt->add(__('Database backup complete.'), EBBS_LANG_CODE);
+            $uploadingList[] = $currentBackupPath['sql'];
+            $backupComplete = true;
         }
 
-        if ($this->getModel()->isDatabaseRequired()) {
-            if(empty($request['databaseBackupComplete'])) {
-                // Disallow to do backups while backup already in proccess.
-                $this->lock();
-
-                $log->string(__(sprintf('Create a backup of the database: %s', $filename['sql']), EBBS_LANG_CODE));
-
-                if ($this->_tablesPerStack > 0) {
-                    $tables = $this->getModel()->getDatabase()->getTablesName();
-                    $response->addData(
-                        array(
-                            'dbDumpFileName' => json_encode($filename['sql']),
-                            'tables' => $tables,
-                            'per_stack' => $this->_tablesPerStack
-                        )
-                    );
-
-                    $log->string(__('Send requests to getting database tables name.', EBBS_LANG_CODE));
-
-                    $log->setCurrentBackupFilesName($filename['sql']);
-
-                    return $response->ajaxExec();
-                } else {
-                    $this->getModel()->getDatabase()->create($filename['sql']);
-                    $dbErrors = $this->getModel()->getDatabase()->getErrors();
-                    if (!empty($dbErrors)) {
-                        $log->string(__(sprintf('Errors during creation of database backup, errors count %d', count($dbErrors)), EBBS_LANG_CODE));
-                        $response->addError($dbErrors);
-                        return $response->ajaxExec();
-                    }
-                    $log->setCurrentBackupFilesName($filename['sql']);
-                }
-            } else {
-                $log->string(__('Database backup complete.'), EBBS_LANG_CODE);
+        if ($this->getModel()->isFilesystemRequired()) {
+            if(!file_exists($currentBackupPath['folder'])) {
+                $bupFolder->getController()->getModel('warehouse')->create($currentBackupPath['folder'] . DS);
             }
+
+            $logTxt->add(__('Scanning files.', EBBS_LANG_CODE));
+            $files = $this->getModel()->getFilesList();
+            // $files = array_map('realpath', $files);
+
+            $logTxt->add(sprintf('%s files scanned.', count($files, true) - count($files)));
+            $logTxt->add(__('Total stacks: ' . count($files), EBBS_LANG_CODE));
+            $techLog->set('stacks', $files);
+            $uploadingList[] = $currentBackupPath['folder'];
+            $backupComplete = false;
         }
+
+        // if need create filesystem backup or send DB backup on cloud - backup not complete
+        if(!empty($files) || $destination !== 'ftp') {
+            $backupComplete = false;
+            $techLog->set('destination', $destination);
+            $techLog->set('uploadingList', $uploadingList);
+            $techLog->set('emailNotifications', (frameEbbs::_()->getModule('options')->get('email_ch') == 1) ? true : false);
+
+            $data = array(
+                'page' => 'backup',
+                'action' => 'createBackupAction',
+                'backupId' => $currentBackupPath['folder'],
+            );
+
+            if(!empty($files))
+                $logTxt->add(__('Send request to generate backup file stacks', EBBS_LANG_CODE));
+
+            $this->getModel('backup')->sendSelfRequest($data);
+        }
+
+        if($backupComplete && frameEbbs::_()->getModule('options')->get('email_ch') == 1) {
+            $email = frameEbbs::_()->getModule('options')->get('email');
+            $subject = __('DropBox Backup by Supsystic Notifications', EBBS_LANG_CODE);
+
+            $logTxt->add(__('Email notification required.', EBBS_LANG_CODE));
+            $logTxt->add(sprintf(__('Sending to', EBBS_LANG_CODE) . '%s', $email));
+
+            $message = $logTxt->getContent(false);
+
+            wp_mail($email, $subject, $message);
+        }
+
+        $response->addData(array(
+            'backupLog' => $logTxt->getContent(),
+            'backupId' => basename($currentBackupPath['folder']),
+            'backupComplete' => $backupComplete
+        ));
+
+        return $response->ajaxExec();
+
         $cloud = $log->getCurrentBackupFilesName();
-        $log->string(__('Backup complete', EBBS_LANG_CODE));
 
         $handlers = $this->getModel()->getDestinationHandlers();
 
@@ -221,19 +215,7 @@ class backupControllerEbbs extends controllerEbbs {
         // Allow to do new backups.
         $this->unlock();
 
-        if (frameEbbs::_()->getModule('options')->get('email_ch') == 1) {
-            $email = frameEbbs::_()->getModule('options')->get('email');
-            $subject = __('Backup by Supsystic Notifications', EBBS_LANG_CODE);
-
-            $log->string(__('Email notification required.', EBBS_LANG_CODE));
-            $log->string(sprintf(__('Sending to', EBBS_LANG_CODE) . '%s', $email));
-
-            $message = $log->getContents();
-
-            wp_mail($email, $subject, $message);
-        }
-
-        $backupPath =  untrailingslashit(frameEbbs::_()->getModule('warehouse')->getPath()) . DS;
+        $backupPath =  untrailingslashit($bupStorageRoot) . DS;
         $pathInfo = pathinfo($cloud[0]);
         $log->save($backupPath . $pathInfo['filename'] . '.txt');
 
@@ -248,39 +230,58 @@ class backupControllerEbbs extends controllerEbbs {
         return $response->ajaxExec();
 	}
 
-    /**
-     * Create Stack Action
-     * Creates stacks of files with EBBS_FILER_PER_STACK files limit and returns temporary file name
-     */
-    public function createStackAction() {
-		@set_time_limit(0);
-
+    public function uploadToCloud() {
         $request = reqEbbs::get('post');
         $response = new responseEbbs();
-
         /** @var backupLogModelEbbs $log */
         $log = $this->getModel('backupLog');
+        $destination = $this->getModel()->getConfig('dest');
+        $handlers = $this->getModel()->getDestinationHandlers();
 
-        if (!isset($request['files'])) {
-            return;
-        }
+        $file = !empty($request['filename']) ? $request['filename'] : false;
 
-        $log->string(__(sprintf('Trying to generate a stack of %s files', count($request['files'])), EBBS_LANG_CODE));
+        if(file_exists($file)) {
+            $stacksFolder = '';
+            $pathInfo = pathinfo($file);
+            if($pathInfo['extension'] == 'zip') {
+                $stacksFolder = basename($pathInfo['dirname']) . '/';
+            }
 
-        $filesystem = $this->getModel()->getFilesystem();
-        $filename = $filesystem->getTemporaryArchive($request['files']);
-        if(frameEbbs::_()->getModule('options')->get('warehouse_abs') == 1){
-            $absPath = str_replace('/', DS, ABSPATH);
-            $filename = str_replace('/', DS, $filename);
-            $filename = str_replace($absPath, '', $filename);
-        }
+            $handler = $handlers[$destination];
+            $result  = call_user_func_array($handler, array(array($file), $stacksFolder));
 
-        if ($filename === null) {
-            $log->string(__('Unable to create the temporary archive', EBBS_LANG_CODE));
-            $response->addError(__('Unable to create the temporary archive', EBBS_LANG_CODE));
+            if ($result === true || $result == 200 || $result == 201) {
+                $log->string(__(sprintf('Successfully uploaded to the "%s": %s', ucfirst($destination), $file), EBBS_LANG_CODE));
+
+            } else {
+                switch ($result) {
+                    case 401:
+                        $error = __('Authentication required.', EBBS_LANG_CODE);
+                        break;
+                    case 404:
+                        $error = __('File not found', EBBS_LANG_CODE);
+                        break;
+                    case 500:
+                        $error = is_object($handler[0]) ? $handler[0]->getErrors() : __('Unexpected error (500)', EBBS_LANG_CODE);
+                        break;
+                    default:
+                        $error = __('Unexpected error', EBBS_LANG_CODE);
+                }
+
+                //todo:if error occurred -  need call method, which will be delete uploaded files from cloud, because backup data is not full. or try to upload file again
+
+                $response->addError($error);
+
+                $log->string(__(
+                    sprintf(
+                        'Cannot upload to the "%s": %s',
+                        ucfirst($destination),
+                        is_array($error) ? array_pop($error) : $error
+                    )
+                    , EBBS_LANG_CODE));
+            }
         } else {
-            $log->string(__(sprintf('Temporary stack %s successfully generated', $filename), EBBS_LANG_CODE));
-            $response->addData(array('filename' => $filename));
+            $response->addError(__('Error! Don\'t exist file: ' . $file, EBBS_LANG_CODE));
         }
 
         return $response->ajaxExec();
@@ -456,7 +457,7 @@ class backupControllerEbbs extends controllerEbbs {
 	public function render($template, $data = array()) {
 		return $this->getView()->getContent('backup.' . $template, $data);
 	}
-	public function checkExtensions($res=false) {
+	public function checkExtensions($res = false) {
 		if(!function_exists('gzopen')) {
             $msg = __('There are no zlib extension on your server. This mean that you can make only database backup.<br/>Check this link <a target="_blank" href="http://php.net/manual/en/zlib.installation.php">http://php.net/manual/en/zlib.installation.php</a> or contact your hosting provider and ask them to resolve this issue for you.', EBBS_LANG_CODE);
             if(is_a($res, 'responseEbbs')){
@@ -479,7 +480,7 @@ class backupControllerEbbs extends controllerEbbs {
 		return array(
 			EBBS_USERLEVELS => array(
 				EBBS_ADMIN => array('render', 'getModel', 'removeAction', 'downloadAction', 'restoreAction', 'writeTmpDbAction',
-					'createStackAction', 'createAction', 'indexAction')
+					'createAction', 'indexAction', 'getBackupsListContentAjax')
 			),
 		);
 	}
@@ -529,13 +530,36 @@ class backupControllerEbbs extends controllerEbbs {
     public function getBackupLog()
     {
         $response = new responseEbbs();
+        $request = reqEbbs::get('post');
+        /** @var backupTechLogModelEbbs $techLog */
+        $techLog = $this->getModel('backupTechLog');
+        $techLog->setLogName($request['backupId']);
+        /** @var backupLogTxtModelEbbs $log */
+        $log = $this->getModel('backupLogTxt');
+        $log->setLogName($request['backupId']);
+        $backupComplete = $techLog->get('complete');
+        $backupMessage = $techLog->get('backupMessage');
+        $uploadedPercent = $techLog->get('uploadedPercent');
 
         $response->addData(
             array(
-                'backupLog' => frameEbbs::_()->getModule('backup')->getModel('backupLog')->getBackupLog(),
+                'backupLog' => $log->getContent(),
+                'backupComplete' => $backupComplete,
+                'backupMessage' => $backupMessage,
+                'uploadedPercent' => $uploadedPercent,
             )
         );
 
+        if($backupComplete)
+            $techLog->deleteOldLogs();
+
         return $response->ajaxExec();
+    }
+
+    public function getBackupsListContentAjax() {
+        $response = new responseEbbs();
+        $content = $this->getView()->getBackupsListContent();
+        $response->addData(array('content' => $content));
+        $response->ajaxExec();
     }
 }

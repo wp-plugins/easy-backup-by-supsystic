@@ -224,12 +224,44 @@ class dropboxControllerEbbs extends controllerEbbs {
 			$response->addError(__('There was an error during recovery', EBBS_LANG_CODE));
 		}
 
-		if($this->model->download($request['file']) === true) {
-			$response->addData(array('filename' => $request['file']));
-		}
-		else {
-			$response->addError($this->model->getErrors());
-		}
+        $extension = pathinfo($request['file'], PATHINFO_EXTENSION);
+
+        if(!$extension) {
+            $stacksLocalFolder = frameEbbs::_()->getModule('warehouse')->getPath() . DS . basename($request['file']) . DS;
+
+            if(!file_exists($stacksLocalFolder))
+                frameEbbs::_()->getModule('warehouse')->getController()->getModel('warehouse')->create($stacksLocalFolder);
+
+            $backupStacksList = $this->model->getUploadedFiles(basename($request['file']) . '/');
+
+//            if(!empty($backupStacksList)) {
+//                $response->addMessage(__('Downloading from DropBox - 0%', EBBS_LANG_CODE));
+//                $response->addData(array('stacksList' => $backupStacksList));
+//            } else {
+//                $response->addError(__('Stacks of backup don\'t find!', EBBS_LANG_CODE));
+//            }
+
+//            return $response->ajaxExec();
+        } else {
+            $backupStacksList[] = $request['file'];
+        }
+
+        if(!empty($backupStacksList)){
+            foreach($backupStacksList as $file) {
+                if(!file_exists(frameEbbs::_()->getModule('backup')->getController()->getModel('backup')->getConfig('warehouse') . $file)) {
+                    if ($this->model->download($file) === true) {
+//                        $response->addData(array('filename' => $file));
+                    } else {
+                        $response->addError($this->model->getErrors());
+                    }
+                }
+            }
+            if(!$extension) {
+                $response->addData(array('filename' => pathinfo($file, PATHINFO_DIRNAME)));
+            } else {
+                $response->addData(array('filename' => $request['file']));
+            }
+        }
 
 		return $response->ajaxExec();
 	}

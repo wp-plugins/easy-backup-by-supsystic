@@ -36,16 +36,24 @@ abstract class modelEbbs extends baseObjectEbbs {
 	public function getModule() {
 		return frameEbbs::_()->getModule( $this->_code );
 	}
-    
+
     public function getBackupInfoByFilename($filename, $logTxt=false) {
+        $pathInfo = pathinfo($filename);
+        $folder = empty($pathInfo['extension']) ? true : false;
+
         if($logTxt)
             $pattern = '/(backup_([0-9_-]*)_id([0-9]+))\.(txt)/ui';
+        elseif($folder)
+            $pattern = '/(backup_([0-9_-]*)_id([0-9]+))/ui';
         else
             $pattern = '/(backup_([0-9_-]*)_id([0-9]+))\.(zip|sql)/ui';
         $matches = array();
 
         if (preg_match($pattern, $filename, $matches)) {
-            list ($name, $rawname, $date, $id, $extension) = $matches;
+            if($folder)
+                list ($name, $rawname, $date, $id) = $matches;
+            else
+                list ($name, $rawname, $date, $id, $extension) = $matches;
 
             $e = explode('-', $date);
             $datetime['date'] = str_replace('_', '-', $e[0]);
@@ -55,7 +63,7 @@ abstract class modelEbbs extends baseObjectEbbs {
                 'id'   => $id,
                 'name' => $name,
                 'raw'  => $rawname,
-                'ext'  => $extension,
+                'ext'  => !empty($extension) ? $extension : null,
                 'date' => $datetime['date'],
                 'time' => $datetime['time'],
             );

@@ -42,7 +42,7 @@ jQuery(document).ready(function() {
 });
 
 var DropboxModule = {
-	
+
 	login: function(form) {
 		jQuery(form).sendFormEbbs({
 			msgElID: 'bupDropboxAlerts',

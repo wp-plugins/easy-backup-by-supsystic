@@ -8,6 +8,7 @@ class backupLogModelEbbs extends modelEbbs
     const KEY = 'ebbs_logger';
     const EBBS_DIR_SETTINGS_KEY = 'ebbs_dir_setting';
     const CURRENT_BACKUP_FILES_NAME = 'ebbs_current_backup_files_name';
+    const CURRENT_BUP_PATH_INFO = 'current_bup_path_info';
 
     /**
      * Write heading message
@@ -44,6 +45,9 @@ class backupLogModelEbbs extends modelEbbs
         }
         if (isset($_SESSION[self::CURRENT_BACKUP_FILES_NAME])) {
             unset ($_SESSION[self::CURRENT_BACKUP_FILES_NAME]);
+        }
+        if (isset($_SESSION[self::CURRENT_BUP_PATH_INFO])) {
+            unset ($_SESSION[self::CURRENT_BUP_PATH_INFO]);
         }
     }
 
@@ -122,20 +126,6 @@ class backupLogModelEbbs extends modelEbbs
         $this->string($text);
     }
 
-    /**
-     * Write to the $_SESSION backups directories by keys, which selected on backup page
-     * @param array $backupSettingsArray
-     */
-    public function saveBackupDirSetting($backupSettingsArray){
-        if(is_array($backupSettingsArray)) {
-            $settingsArray = array('full' => 0, 'wp_core' => 0, 'plugins' => 0, 'themes' => 0, 'uploads' => 0, 'any_directories' => 0, 'exclude' => '');
-            foreach($backupSettingsArray as $key => $setting){
-                if(array_key_exists($key, $settingsArray))
-                    $settingsArray[$key] = $setting;
-            }
-            $_SESSION[self::EBBS_DIR_SETTINGS_KEY] = serialize($settingsArray);
-        }
-    }
     public function setCurrentBackupFilesName($filename){
         if(!empty($filename)) {
             $files = $this->getCurrentBackupFilesName();
@@ -143,7 +133,16 @@ class backupLogModelEbbs extends modelEbbs
             $_SESSION[self::CURRENT_BACKUP_FILES_NAME] = $files;
         }
     }
+
     public function getCurrentBackupFilesName(){
         return !empty($_SESSION[self::CURRENT_BACKUP_FILES_NAME]) ? $_SESSION[self::CURRENT_BACKUP_FILES_NAME] : null;
+    }
+
+    public function setCurrentBupInfo(array $info){
+        $_SESSION[self::CURRENT_BUP_PATH_INFO] = $info;
+    }
+
+    public function getCurrentBupInfo(){
+        return !empty($_SESSION[self::CURRENT_BUP_PATH_INFO]) ? $_SESSION[self::CURRENT_BUP_PATH_INFO] : false;
     }
 }

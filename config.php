@@ -29,7 +29,7 @@
     define('EBBS_MODULES_DIR', EBBS_DIR. 'modules'. DS);
     define('EBBS_FILES_DIR', EBBS_DIR. 'files'. DS);
     define('EBBS_ADMIN_DIR', ABSPATH. 'wp-admin'. DS);
-	define('EBBS_S_WP_PLUGIN_NAME', 'Easy backup by Supsystic');
+	define('EBBS_S_WP_PLUGIN_NAME', 'DropBox Backup by Supsystic');
 
 
     define('EBBS_SITE_URL', get_bloginfo('wpurl'). '/');
@@ -59,7 +59,7 @@
 
 
     define('EBBS_PLUGIN_INSTALLED', true);
-    define('EBBS_VERSION', '1.1.3');
+    define('EBBS_VERSION', '1.1.4');
 	define('EBBS_S_VERSION', EBBS_VERSION);
     define('EBBS_USER', 'user');
 
@@ -90,11 +90,11 @@
 	define('EBBS_LANG_CODE', 'but_lng');
 
     /** Files per stack in filesystem backup */
-    define('EBBS_FILES_PER_STACK', 400);
+    define('EBBS_FILES_PER_STACK', 250);
 
 	//define('PCLZIP_TEMPORARY_DIR', '/usr/www/temp/');
 	//require_once(EBBS_HELPERS_DIR. 'pclzip.lib.php');
 
     define('EBBS_LOCK_FIELD', 'ebbs_locked');
 	
-	define('EBBS_WP_PLUGIN_NAME', 'Easy backup by Supsystic');
+	define('EBBS_WP_PLUGIN_NAME', 'DropBox Backup by Supsystic');

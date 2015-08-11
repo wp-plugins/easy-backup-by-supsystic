@@ -4,7 +4,6 @@
  * Class filesystemModelEbbs
  */
 class filesystemModelEbbs extends modelEbbs {
-
     /**
      * Create filesystem backup
      * @param string $filename File name with full path to the file
@@ -30,7 +29,7 @@ class filesystemModelEbbs extends modelEbbs {
             return false;
         }
 
-        $logFilename  = str_replace('.zip', '.txt', $filename);
+        $logFilename  = $filename . '.txt';
         if(file_exists($logFilename)) {
             $logContent = file($logFilename);
             $backupDirSettings = unserialize(array_pop($logContent));
@@ -45,7 +44,8 @@ class filesystemModelEbbs extends modelEbbs {
             $backup = $this->getModule();
             $backup->loadLibrary('pcl');
         }
-        $pcl = new PclZip($filename);
+
+        /*$pcl = new PclZip($filename);
         if($absolutePath) {
             $absPath = explode(DS, ABSPATH);
             $absPath = $absPath[0].DS;
@@ -67,8 +67,9 @@ class filesystemModelEbbs extends modelEbbs {
             $stacksPath = realpath($warehouse . DS . 'tmp') . DS;
         else
             $stacksPath = realpath(ABSPATH . $warehouse . DS . 'tmp') . DS;
+        */
 
-        $stacks = glob($stacksPath . 'BUP*');
+        $stacks = glob($filename . DS . 'BUP*');
 
         if (empty($stacks)) {
             return true;
@@ -80,7 +81,7 @@ class filesystemModelEbbs extends modelEbbs {
 
                 $pcl->extract(PCLZIP_OPT_PATH, ABSPATH, PCLZIP_OPT_REPLACE_NEWER);
 
-                unlink($stack);
+//                unlink($stack);
                 unset($pcl);
             }
         }
@@ -93,11 +94,12 @@ class filesystemModelEbbs extends modelEbbs {
      * @param array $files A numeric array of files
      * @return null|string Path to the tmp file if one or more files has been handled or null.
      */
-    public function getTemporaryArchive(array $files)
+    public function getTemporaryArchive(array $files, $backupFolder)
     {
-        $temporary = frameEbbs::_()->getModule('warehouse')->getTemporaryPath()
-            . DIRECTORY_SEPARATOR
-            . uniqid('BUP', true);
+        $temporary = $backupFolder
+            . DS
+            . uniqid('BUP')
+            . '.zip';
 
         $this->getArchive($temporary, $files);
 
@@ -190,7 +192,8 @@ class filesystemModelEbbs extends modelEbbs {
             }
         }
 
-        $absPath = str_replace('/', DS, ABSPATH);
+//        $absPath = str_replace('/', DS, ABSPATH);
+        $absPath = rtrim(rtrim(ABSPATH, '/'), '\\');
 
         $nodes = array();
 
@@ -244,9 +247,12 @@ class filesystemModelEbbs extends modelEbbs {
         return array();
     }
 
+    /*
+     * This method will checking(by backup settings from log) is writable the restoring files
+     * */
     public function getFilesListByBUPDirSettingArray($options)
     {
-        $excluded = array(EBBS_PLUG_NAME, EBBS_PLUG_NAME_PRO);
+        $excluded = $this->getModule('backup')->getController()->getModel('backup')->getDefaultExcludedFolders();
 
         // Where we are need to look for files.
         $directory = realpath(ABSPATH);
@@ -343,6 +349,31 @@ class filesystemModelEbbs extends modelEbbs {
             foreach ($tmpFiles as $file) {
                 if (file_exists($file))
                     unlink($file);
+            }
+        }
+    }
+
+    /** Delete local backup after uploading to cloud
+     * @param $backups
+     */
+    public function deleteLocalBackup(array $backups){
+        foreach($backups as $backup){
+            $extension = pathinfo($backup, PATHINFO_EXTENSION);
+
+            if($extension != 'txt' && file_exists($backup)) {
+                if(is_dir($backup)){
+                    $files = scandir($backup);
+
+                    foreach($files as $file) {
+                        $file = $backup . DS . $file;
+                        if(is_file($file))
+                            unlink($file);
+                    }
+
+                    rmdir($backup);
+                } else {
+                    unlink($backup);
+                }
             }
         }
     }

@@ -60,13 +60,13 @@ class dropbox52ModelEbbs extends modelEbbs {
      * Get an associative array with dropbox metadata from sandbox
      * @return array|null
      */
-    public function getUploadedFiles() {
+    public function getUploadedFiles($stacksFolder = '') {
 
         if (!$this->isAuthenticated()) {
             return null;
         }
 
-        $url = self::API_URL. 'metadata/sandbox' . $this->getDropboxPath();
+        $url = self::API_URL. 'metadata/sandbox' . $this->getDropboxPath() . $stacksFolder;
 
         $request = curlEbbs::createGetRequest($url, array(
             'file_limit' => 25000,
@@ -86,22 +86,34 @@ class dropbox52ModelEbbs extends modelEbbs {
         }
 
         // Formatting uploading data files for use their on backups page
-        $files = array();
-        foreach ($response['contents'] as $file) {
-            $pathInfo = pathinfo($file['path']);
-            $backupInfo = $this->getBackupInfoByFilename($pathInfo['basename']);
+        if(!$stacksFolder) {
+            // Formatting uploading data files for use their on backups page
+            $files = array();
+            foreach ($response['contents'] as $file) {
+                $pathInfo = pathinfo($file['path']);
+                $backupInfo = $this->getBackupInfoByFilename($pathInfo['basename']);
 
-            if(!empty($backupInfo['ext']) && $backupInfo['ext'] == 'sql'){
-                $files[$backupInfo['id']]['dropbox']['sql'] = $file;
-                $files[$backupInfo['id']]['dropbox']['sql']['backupInfo'] = $backupInfo;
-                $files[$backupInfo['id']]['dropbox']['sql']['backupInfo'] = dispatcherEbbs::applyFilters('addInfoIfEncryptedDb', $files[$backupInfo['id']]['dropbox']['sql']['backupInfo']);
-            }elseif(!empty($backupInfo['ext']) && $backupInfo['ext'] == 'zip'){
-                $files[$backupInfo['id']]['dropbox']['zip'] = $file;
-                $files[$backupInfo['id']]['dropbox']['zip']['backupInfo'] = $backupInfo;
+                if (!empty($backupInfo['ext']) && $backupInfo['ext'] == 'sql') {
+                    $files[$backupInfo['id']]['dropbox']['sql'] = $file;
+                    $files[$backupInfo['id']]['dropbox']['sql']['backupInfo'] = $backupInfo;
+                    $files[$backupInfo['id']]['dropbox']['sql']['backupInfo'] = dispatcherEbbs::applyFilters('addInfoIfEncryptedDb', $files[$backupInfo['id']]['dropbox']['sql']['backupInfo']);
+                } elseif (empty($backupInfo['ext'])) {
+                    $files[$backupInfo['id']]['dropbox']['zip'] = $file;
+                    $files[$backupInfo['id']]['dropbox']['zip']['backupInfo'] = $backupInfo;
+                }
             }
+            unset($response['contents']);
+            $response['contents'] = $files;
+        } else {
+            $files = array();
+
+            foreach ($response['contents'] as $file) {
+                $pathInfo = pathinfo($file['path']);
+                $files[] = basename($pathInfo['dirname']) . '/' . basename($file['path']);
+            }
+
+            $response = $files;
         }
-        unset($response['contents']);
-        $response['contents']= $files;
 
         return $response;
     }
@@ -135,7 +147,7 @@ class dropbox52ModelEbbs extends modelEbbs {
      * @param array $files An array of files to upload
      * @return int
      */
-    public function upload($files = array()) {
+    public function upload($files = array(), $stacksFolder = '') {
         if (!$this->isAuthenticated()) return 401;
         if (empty($files)) return 404;
 
@@ -145,7 +157,7 @@ class dropbox52ModelEbbs extends modelEbbs {
 
             $file = basename($file);
 
-            if (file_exists($file = rtrim($filepath, '/') . '/' . $file)) {
+            if (file_exists($file = rtrim($filepath, '/') . '/' . $stacksFolder . $file)) {
                 $pointer = @fopen($file, 'rb');
 
                 if (!$pointer) {
@@ -241,6 +253,7 @@ class dropbox52ModelEbbs extends modelEbbs {
                     $url = self::CONTENT_URL
                         . 'commit_chunked_upload/auto'
                         . $this->getDropboxPath()
+                        . $stacksFolder
                         . basename($file);
 
                     $request = curlEbbs::createPostRequest(
@@ -313,6 +326,7 @@ class dropbox52ModelEbbs extends modelEbbs {
      * @return bool
      */
     public function download($filename, $returnDataString = false) {
+        @set_time_limit(0);
         if (!$this->isAuthenticated()) {
             $this->pushError(__('Authentication required', EBBS_LANG_CODE));
             return false;

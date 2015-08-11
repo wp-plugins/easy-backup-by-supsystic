@@ -1,10 +1,10 @@
 === DropBox Backup by Supsystic ===
 Contributors: supsystic.com
-Tags: dropbox backup, dropbox backup restoration, backup, back up, restoration, dropbox, FTP, mysql backup, database backup, db backup, full backup, restore, transfer, website backup, wordpress backup, backup plugins, backup posts, backup pages 
-Tested up to: 4.2.2
-Stable tag: 1.1.3
+Tags: backup, dropbox backup, dropbox backup restoration, backup, back up, restoration, dropbox, FTP, mysql backup, database backup, db backup, full backup, restore, transfer, website backup, wordpress backup, backup plugins, backup posts, backup pages 
+Tested up to: 4.2.4
+Stable tag: 1.1.4
 
-Backup to the Dropbox and FTP with one click. DropBox backup restoration. Different types of backup.
+Backup to Dropbox, local computer and FTP with one click. DropBox backup restoration. Different types of backup and backup restoration
 
 == Description ==
 
@@ -33,9 +33,14 @@ Create Dropbox backup in one click. Easy-to-use functionality - now you don't ha
 3. Copy the DropBox Backup by Supsystic folder with plugin
 4. Open ftp \wp-content\plugins\
 5. Paste the plug-ins folder in the folder
-6. Go to admin panel => open item "Plugins" => activate the plugin 
+6. Go to admin panel => open item "Plugins" => activate the backup plugin 
 
 == Changelog ==
+
+= 1.1.4 / 11.08.2015 =
+ * FTP Backup big files fix
+ * Database backup to Dropbox
+ * Backup restoration optimization
 
 = 1.1.3 / 22.07.2015 =
  * Minor interface change
